@@ -42,7 +42,6 @@ class Overcooked:
     
     def load_level(self, level):
         x, y = 0, 0
-        # level = level + '.txt'
 
         with open(level, 'r') as file:
             # Mark the phases of reading.
@@ -83,6 +82,8 @@ class Overcooked:
 
         while len(self.sim_agents) < self.num_agents:
             location = random.choice(self.spawnable)
+            if len(self.spawnable) <= 0:
+                raise ValueError('number of agents exceeds the number of available tiles')
             self.spawnable.remove(location)
             sim_agent = Agent(name='player_'+str(len(self.sim_agents)), location=location)
             self.sim_agents.append(sim_agent)
@@ -106,8 +107,11 @@ class Overcooked:
         self.load_level(self.level)
 
     def step(self, joint_action_dict):
-        for agent in self.sim_agents:
-            agent.move(joint_action_dict[agent.name], self.world)
+        step_flag = [False] * len(joint_action_dict)
+        for _ in range(len(joint_action_dict)):
+            for i, agent in enumerate(self.sim_agents):
+                if not step_flag[i]:
+                    step_flag[i] = agent.move(joint_action_dict[agent.name], self.world)
         self.cur_step += 1
         self.incomplete = self.world.incomplete
 

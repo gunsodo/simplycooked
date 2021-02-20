@@ -37,9 +37,9 @@ class Agent:
         elif direction == 'd':
             x += 1 # E
         elif direction == 'x':
-            return
+            return True
         else:
-            return
+            return True
 
         # check if a Counter is in the way
         obj_list = world.get((x, y))
@@ -49,6 +49,10 @@ class Agent:
             _update_location(self, (x, y), world)
             if self.holding:
                 _update_location(self.holding, (x, y), world)
+            return True
+        
+        elif _contains_instance(obj_list, Agent):
+            return False
 
         # counter
         else:
@@ -109,6 +113,7 @@ class Agent:
                     pass
                 else:
                     pass
+            return True
 
 def _contains_instance(obj_list, obj_cls):
     return any(isinstance(obj, obj_cls) for obj in obj_list)

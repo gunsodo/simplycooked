@@ -97,3 +97,6 @@ class World:
     def get(self, location):
         return self.objects[location]
 
+    def to_sparse(self):
+        # TODO
+        pass
