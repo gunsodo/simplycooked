@@ -43,25 +43,40 @@ class PorkCounter(IngredientCounter):
         super().__init__('PorkCounter', location)
         self.contains = Pork(self.location)
 
+    def remove(self):
+        return Pork(self.location)
+
 class CheeseCounter(IngredientCounter):
     def __init__(self, location):
         super().__init__('CheeseCounter', location)
         self.contains = Cheese(self.location)
+
+    def remove(self):
+        return Cheese(self.location)
 
 class LettuceCounter(IngredientCounter):
     def __init__(self, location):
         super().__init__('LettuceCounter', location)
         self.contains = Lettuce(self.location)
 
+    def remove(self):
+        return Lettuce(self.location)
+
 class TomatoCounter(IngredientCounter):
     def __init__(self, location):
         super().__init__('TomatoCounter', location)
         self.contains = Tomato(self.location)
 
+    def remove(self):
+        return Tomato(self.location)
+
 class BreadCounter(IngredientCounter):
     def __init__(self, location):
         super().__init__('BreadCounter', location)
         self.contains = Bread(self.location)
+
+    def remove(self):
+        return Bread(self.location)
 
 class ActionCounter(Counter):
     def __init__(self, name, location):
