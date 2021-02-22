@@ -143,8 +143,10 @@ class Overcooked(MultiAgentEnv):
                 if i_recipe_trim == recipe:
                     reward += recipe.layers * progress_rwd
                     incomplete.remove(i_recipe)
-
-        reward += deliver_rwd * self.count_completed()
+        
+        for recipe in self.deliver_counter.contains:
+            reward += recipe.layers * progress_rwd + deliver_rwd
+            
         return reward
     
 
