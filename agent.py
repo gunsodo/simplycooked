@@ -64,6 +64,8 @@ class Agent:
                 if isinstance(c, IngredientCounter):
                     pass                                                # cannot hold other stuff
                 elif isinstance(c, ActionCounter):
+                    if isinstance(self.holding, Recipe):
+                        pass
                     if contain == None:                                 # if the ActionCounter is available, put it down
                         if isinstance(c, Pan) and not self.holding.is_grillable():
                             pass
