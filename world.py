@@ -4,6 +4,8 @@ from recipe import *
 from ingredients import *
 from agent import _get_instance, _contains_instance
 
+import numpy as np
+
 CLS_TO_REP = {
     'Pork': 'p',
     'Lettuce': 'l',
@@ -24,10 +26,13 @@ CLS_TO_REP = {
     'Pan': 'Z',
 }
 
+CLS_LIST = list(CLS_TO_REP.keys())
+
 class World:
-    def __init__(self, x, y):
+    def __init__(self, x, y, num_agents):
         self.width = x
         self.height = y
+        self.num_agents = num_agents
 
         # initialize empty dict for all cells
         locs = [((_x, _y), []) for _y in range(y) for _x in range(x)]
@@ -97,6 +102,22 @@ class World:
     def get(self, location):
         return self.objects[location]
 
-    def to_sparse(self):
-        # TODO
-        pass
+    def to_sparse(self, agent_name):
+        obj_list = []
+        agent_locs = []
+        arrs = np.zeros((len(CLS_LIST)+self.num_agents-1, self.width, self.height))
+        for k, v in self.objects.items():
+            for obj in v:
+                if isinstance(obj, Agent):
+                    if obj.name == agent_name:
+                        continue
+                    agent_locs.append((int(obj.name[-1]), k))
+                else:
+                    arrs[CLS_LIST.index(obj.name)][k[1]][k[0]] += 1
+        
+        # agents
+        agent_locs.sort()
+        for i, agent_loc in enumerate(agent_locs):
+            arrs[len(CLS_LIST)+i][agent_loc[1][1]][agent_loc[1][0]] += 1
+
+        return arrs.astype('float32')

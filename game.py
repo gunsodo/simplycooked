@@ -54,7 +54,7 @@ class Overcooked:
                 # Phase 0: Instantiate World object
                 elif phase == 0:
                     _x, _y = line.split()
-                    self.world = World(int(_x), int(_y))
+                    self.world = World(int(_x), int(_y), self.num_agents)
 
                 # Phase 1: Read in kitchen map.
                 elif phase == 1:
