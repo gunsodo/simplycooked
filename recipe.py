@@ -22,7 +22,7 @@ class Recipe:
         return self._str_list(self.contains) == self._str_list(other.contains)
 
     def add(self, obj):
-        if self.layers < 7:
+        if self.layers < 5:
             self.contains.append(obj)
             self.layers += 1
 
