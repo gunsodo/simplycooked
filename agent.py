@@ -98,6 +98,7 @@ class Agent:
                 if isinstance(c, IngredientCounter):
                     self.pick(c.remove())
                     world.add(self.holding)
+                    _update_location(self.holding, self.location, world)
                 elif isinstance(c, ActionCounter):
                     if contain:
                         if contain.grilled or contain.chopped:          # already cooked, so pick it up
