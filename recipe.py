@@ -28,6 +28,12 @@ class Recipe:
     def move_to(self, location):
         self.location = location
 
+    def trim(self, layers):
+        recipe = Recipe(self.location)
+        recipe.contains = self.contains[:layers]
+        recipe.layers = layers
+        return recipe
+
 class VeggieBurger(Recipe):
     def __init__(self):
         super().__init__(None)
