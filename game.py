@@ -133,6 +133,8 @@ class Overcooked:
 
         reward = 0
         for recipe in world_recipes:
+            if recipe.layers <= 0:
+                continue
             for i_recipe in incomplete:
                 if recipe.layers > i_recipe.layers:
                     continue
