@@ -22,8 +22,9 @@ class Recipe:
         return self._str_list(self.contains) == self._str_list(other.contains)
 
     def add(self, obj):
-        self.contains.append(obj)
-        self.layers += 1
+        if self.layers < 5:
+            self.contains.append(obj)
+            self.layers += 1
 
     def move_to(self, location):
         self.location = location
