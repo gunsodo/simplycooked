@@ -74,7 +74,7 @@ class World:
             else:
                 print(CLS_TO_REP[c.name], end='')
 
-            if k[0] >= self.width:
+            if k[0] >= self.width-1:
                 print('')
 
         print("-"*60)
