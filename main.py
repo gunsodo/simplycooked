@@ -43,6 +43,7 @@ def start(num_agents, level, horizon):
         print("-"*60)
         print(f"# of completed subtasks: {env.count_completed()}")
         print(f"# of incompleted subtasks: {len(env.incomplete)}")
+        print(f"score: {env.reward_by_progress()}")
         print("-"*60)
     
     if env.succeed():

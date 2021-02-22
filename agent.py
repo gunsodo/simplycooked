@@ -66,7 +66,7 @@ class Agent:
                 elif isinstance(c, ActionCounter):
                     if isinstance(self.holding, Recipe):
                         pass
-                    if contain == None:                                 # if the ActionCounter is available, put it down
+                    elif contain == None:                                 # if the ActionCounter is available, put it down
                         if isinstance(c, Pan) and not self.holding.is_grillable():
                             pass
                         elif isinstance(c, Cutboard) and not self.holding.is_choppable():
@@ -74,6 +74,8 @@ class Agent:
                         else:
                             c.add(self.drop())
                             _update_location(c.contains, c.location, world)
+                    else:
+                        pass
                 elif isinstance(c, PlainCounter):
                     if isinstance(contain, Recipe):                     # if there is a Recipe, add to the Recipe
                         if isinstance(self.holding, Recipe):
