@@ -81,9 +81,10 @@ class Agent:
                         if isinstance(self.holding, Recipe):
                             pass
                         else:
-                            dropped = self.drop()
-                            contain.add(dropped)
-                            _update_location(dropped, c.location, world)
+                            if not contain.full():
+                                dropped = self.drop()
+                                contain.add(dropped)
+                                _update_location(dropped, c.location, world)
                     elif contain == None:                               # PlainCounter is empty, put it down
                         c.add(self.drop())
                         _update_location(c.contains, c.location, world)
