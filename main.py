@@ -1,4 +1,4 @@
-from game import Overcooked
+from coop_marl.simplycooked.game import Overcooked
 import argparse
 
 def parse_arguments():

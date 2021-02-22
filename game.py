@@ -1,9 +1,10 @@
-from world import *
-from agent import *
-from counter import *
-import recipe
-from ingredients import *
+from coop_marl.simplycooked.world import *
+from coop_marl.simplycooked.agent import *
+from coop_marl.simplycooked.counter import *
+import coop_marl.simplycooked.recipe as recipe
+from coop_marl.simplycooked.ingredients import *
 
+from ray.rllib.env.multi_agent_env import MultiAgentEnv
 import random
 
 REP_TO_CLS = {
@@ -26,7 +27,7 @@ REP_TO_CLS = {
     'Z': Pan,
 }
 
-class Overcooked:
+class Overcooked(MultiAgentEnv):
     def __init__(self, num_agents, level, horizon):
         self.num_agents = num_agents
         self.level = level

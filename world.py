@@ -1,8 +1,8 @@
-from counter import *
-from agent import *
-from recipe import *
-from ingredients import *
-from agent import _get_instance, _contains_instance
+from coop_marl.simplycooked.counter import *
+from coop_marl.simplycooked.agent import *
+from coop_marl.simplycooked.recipe import *
+from coop_marl.simplycooked.ingredients import *
+from coop_marl.simplycooked.agent import _get_instance, _contains_instance
 
 import numpy as np
 

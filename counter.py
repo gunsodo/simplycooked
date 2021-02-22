@@ -1,4 +1,4 @@
-from ingredients import *
+from coop_marl.simplycooked.ingredients import *
 
 class Counter:
     def __init__(self, name, location):

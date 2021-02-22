@@ -1,6 +1,6 @@
-import world
-from counter import *
-from recipe import *
+import coop_marl.simplycooked.world
+from coop_marl.simplycooked.counter import *
+from coop_marl.simplycooked.recipe import *
 
 class Agent:
     def __init__(self, name, location, facing='S'):
