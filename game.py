@@ -125,7 +125,7 @@ class Overcooked(MultiAgentEnv):
     def succeed(self):
         return len(self.incomplete) == 0
 
-    def reward_by_progress(self, pts=5):
+    def reward_by_progress(self, progress_rwd=5, deliver_rwd=10):
         incomplete = self.incomplete[:]
         incomplete.sort(key=lambda x: x.layers)
 
@@ -141,8 +141,10 @@ class Overcooked(MultiAgentEnv):
                     continue
                 i_recipe_trim = i_recipe.trim(recipe.layers)
                 if i_recipe_trim == recipe:
-                    reward += recipe.layers * 5
+                    reward += recipe.layers * progress_rwd
                     incomplete.remove(i_recipe)
+
+        reward += deliver_rwd * self.count_completed()
         return reward
     
 
