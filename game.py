@@ -87,7 +87,8 @@ class Overcooked:
             self.spawnable.remove(location)
             sim_agent = Agent(name='player_'+str(len(self.sim_agents)), location=location)
             self.sim_agents.append(sim_agent)
-            self.world.objects[location].append(sim_agent)        
+            self.world.objects[location].append(sim_agent)
+            self.world.full_obs_space[len(CLS_LIST)+len(self.sim_agents)-1][location[1]][location[0]] += 1
 
         self.world.missions = self.missions
         self.world.incomplete = self.missions
@@ -145,7 +146,7 @@ class Overcooked:
         
         for recipe in self.deliver_counter.contains:
             reward += recipe.layers * progress_rwd + deliver_rwd
-            
+
         return reward
     
 
