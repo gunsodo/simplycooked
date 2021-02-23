@@ -1,12 +1,6 @@
-<<<<<<< HEAD
-import coop_marl.simplycooked.world
+import coop_marl.simplycooked.world as w
 from coop_marl.simplycooked.counter import *
 from coop_marl.simplycooked.recipe import *
-=======
-import world as w
-from counter import *
-from recipe import *
->>>>>>> 02b0a9cf23c3288605fb8fe648b9982bf47163b4
 
 class Agent:
     def __init__(self, name, location, facing='S'):
