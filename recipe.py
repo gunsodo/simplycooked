@@ -22,9 +22,8 @@ class Recipe:
         return self._str_list(self.contains) == self._str_list(other.contains)
 
     def add(self, obj):
-        if self.layers < 5:
-            self.contains.append(obj)
-            self.layers += 1
+        self.contains.append(obj)
+        self.layers += 1
 
     def move_to(self, location):
         self.location = location
@@ -34,6 +33,9 @@ class Recipe:
         recipe.contains = self.contains[:layers]
         recipe.layers = layers
         return recipe
+
+    def full(self):
+        return self.layers >= 7
 
 class VeggieBurger(Recipe):
     def __init__(self):
