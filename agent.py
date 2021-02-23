@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 import coop_marl.simplycooked.world
 from coop_marl.simplycooked.counter import *
 from coop_marl.simplycooked.recipe import *
+=======
+import world as w
+from counter import *
+from recipe import *
+>>>>>>> 02b0a9cf23c3288605fb8fe648b9982bf47163b4
 
 class Agent:
     def __init__(self, name, location, facing='S'):
@@ -132,6 +138,30 @@ def _get_instance(obj_list, obj_cls):
         return instance[0]
 
 def _update_location(obj, new_location, world):
+    # remove
     world.objects[obj.location].remove(obj)
+    if isinstance(obj, Agent):
+        world.full_obs_space[len(w.CLS_LIST)+int(obj.name[-1])][obj.location[1]][obj.location[0]] -= 1
+    else:
+        world.full_obs_space[w.CLS_LIST.index(obj.name)][obj.location[1]][obj.location[0]] -= 1
+        if isinstance(obj, Recipe):
+            for item in obj.contains:
+                world.objects[item.location].remove(item)
+                world.full_obs_space[w.CLS_LIST.index(item.name)][item.location[1]][item.location[0]] -= 1
+    
+    # add
     world.objects[new_location].append(obj)
+    if isinstance(obj, Agent):
+        world.full_obs_space[len(w.CLS_LIST)+int(obj.name[-1])][new_location[1]][new_location[0]] += 1
+    else:
+        world.full_obs_space[w.CLS_LIST.index(obj.name)][new_location[1]][new_location[0]] += 1
+        if isinstance(obj, Recipe):
+            for item in obj.contains:
+                world.objects[new_location].append(item)
+                world.full_obs_space[w.CLS_LIST.index(item.name)][new_location[1]][new_location[0]] += 1
+
+    # update
     obj.location = new_location
+    if isinstance(obj, Recipe):
+        for item in obj.contains:
+            item.location = new_location

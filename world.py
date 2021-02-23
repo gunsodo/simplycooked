@@ -1,8 +1,7 @@
 from coop_marl.simplycooked.counter import *
-from coop_marl.simplycooked.agent import *
 from coop_marl.simplycooked.recipe import *
 from coop_marl.simplycooked.ingredients import *
-from coop_marl.simplycooked.agent import _get_instance, _contains_instance
+from coop_marl.simplycooked.agent import _get_instance, _contains_instance, Agent
 
 import numpy as np
 
@@ -40,6 +39,7 @@ class World:
         self.recipes = []
         self.missions = []
         self.incomplete = []
+        self.full_obs_space = np.zeros((len(CLS_LIST)+self.num_agents, self.width, self.height), dtype='float32')
 
     def _str_list(self, item_list):
         item_list = [str(item) for item in item_list]
@@ -94,30 +94,34 @@ class World:
 
         if isinstance(obj, Recipe):
             self.recipes.append(obj)
+        
+        # update array
+        self.full_obs_space[CLS_LIST.index(obj.name)][obj.location[1]][obj.location[0]] += 1
     
     def remove(self, obj):
         if obj in self.objects[obj.location]:
             self.objects[obj.location].remove(obj)
+            self.full_obs_space[CLS_LIST.index(obj.name)][obj.location[1]][obj.location[0]] -= 1
 
     def get(self, location):
         return self.objects[location]
 
-    def to_sparse(self, agent_name):
-        obj_list = []
-        agent_locs = []
-        arrs = np.zeros((len(CLS_LIST)+self.num_agents-1, self.width, self.height))
-        for k, v in self.objects.items():
-            for obj in v:
-                if isinstance(obj, Agent):
-                    if obj.name == agent_name:
-                        continue
-                    agent_locs.append((int(obj.name[-1]), k))
-                else:
-                    arrs[CLS_LIST.index(obj.name)][k[1]][k[0]] += 1
+    # def to_sparse(self, agent_name):
+    #     obj_list = []
+    #     agent_locs = []
+    #     arrs = np.zeros((len(CLS_LIST)+self.num_agents-1, self.width, self.height))
+    #     for k, v in self.objects.items():
+    #         for obj in v:
+    #             if isinstance(obj, Agent):
+    #                 if obj.name == agent_name:
+    #                     continue
+    #                 agent_locs.append((int(obj.name[-1]), k))
+    #             else:
+    #                 arrs[CLS_LIST.index(obj.name)][k[1]][k[0]] += 1
         
-        # agents
-        agent_locs.sort()
-        for i, agent_loc in enumerate(agent_locs):
-            arrs[len(CLS_LIST)+i][agent_loc[1][1]][agent_loc[1][0]] += 1
+    #     # agents
+    #     agent_locs.sort()
+    #     for i, agent_loc in enumerate(agent_locs):
+    #         arrs[len(CLS_LIST)+i][agent_loc[1][1]][agent_loc[1][0]] += 1
 
-        return arrs.astype('float32')
+    #     return arrs.astype('float32')
