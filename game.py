@@ -5,6 +5,7 @@ import recipe
 from ingredients import *
 
 import random
+import copy
 
 REP_TO_CLS = {
     'p': Pork,
@@ -36,7 +37,9 @@ class Overcooked:
         self.world = None
         self.missions = []
         self.incomplete = []
+        self._deliver_counter = None
         self.deliver_counter = None
+        self._spawnable = None
         self.spawnable = []
         self.sim_agents = []
         self.cur_step = 0
@@ -74,6 +77,7 @@ class Overcooked:
                                 self.world.add(counter)
                             elif rep == 'D':
                                 self.deliver_counter = REP_TO_CLS[rep](location=(x, y))
+                                self._deliver_counter = self.deliver_counter
                                 self.world.add(self.deliver_counter)
                             else:
                                 self.spawnable.append((x, y))
@@ -82,17 +86,20 @@ class Overcooked:
                     elif phase == 2:
                         self.missions.append(getattr(recipe, line)())
             
-            self.world.missions = self.missions
-            self.world.incomplete = self.missions
+            self._spawnable = self.spawnable[:]
+            self.world.missions = self.missions[:]
+            self.world.incomplete = self.missions[:]
             self.world.width = x+1
             self.world.height = y
-            self._world = self.world
-            self._missions = self.missions
-            self.incomplete = self.missions
+            self._world = copy.deepcopy(self.world)
+            self._missions = self.missions[:]
+            self.incomplete = self.missions[:]
         else:
-            self.world = self._world
-            self.missions = self._missions
-            self.incomplete = self._missions
+            self.deliver_counter = copy.deepcopy(self._deliver_counter)
+            self.spawnable = self._spawnable[:]
+            self.world = copy.deepcopy(self._world)
+            self.missions = self._missions[:]
+            self.incomplete = self._missions[:]
 
         while len(self.sim_agents) < self.num_agents:
             location = random.choice(self.spawnable)
