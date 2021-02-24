@@ -14,7 +14,7 @@ def print_recipes(recipes):
 
 def start(num_agents, level, horizon):
     env = Overcooked(num_agents, level, horizon)
-    env.reset()
+    env.reset(init=True)
 
     print(f"loaded level: {level}")
     print(f"# of players: {num_agents}")

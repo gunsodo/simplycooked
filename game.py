@@ -33,6 +33,7 @@ class Overcooked(MultiAgentEnv):
         self.level = level
         self.horizon = horizon
 
+        self._world = None
         self.world = None
         self.missions = []
         self.incomplete = []
@@ -41,45 +42,58 @@ class Overcooked(MultiAgentEnv):
         self.sim_agents = []
         self.cur_step = 0
     
-    def load_level(self, level):
+    def load_level(self, level, init=False):
         x, y = 0, 0
 
-        with open(level, 'r') as file:
-            # Mark the phases of reading.
-            phase = 0
-            for line in file:
-                line = line.strip('\n')
-                if line == '':
-                    phase += 1
+        if init:
+            with open(level, 'r') as file:
+                # Mark the phases of reading.
+                phase = 0
+                for line in file:
+                    line = line.strip('\n')
+                    if line == '':
+                        phase += 1
 
-                # Phase 0: Instantiate World object
-                elif phase == 0:
-                    _x, _y = line.split()
-                    self.world = World(int(_x), int(_y), self.num_agents)
+                    # Phase 0: Instantiate World object
+                    elif phase == 0:
+                        _x, _y = line.split()
+                        self.world = World(int(_x), int(_y), self.num_agents)
 
-                # Phase 1: Read in kitchen map.
-                elif phase == 1:
-                    for x, rep in enumerate(line):
-                        # Ingredients/Recipes
-                        if rep in 'rpltcb':
-                            counter = PlainCounter(location=(x, y))
-                            obj = REP_TO_CLS[rep](location=(x, y))
-                            counter.add(obj)
-                            self.world.add(obj)
-                            self.world.add(counter)
-                        # Counter
-                        elif rep in '-PLTCBSZ':
-                            counter = REP_TO_CLS[rep](location=(x, y))
-                            self.world.add(counter)
-                        elif rep == 'D':
-                            self.deliver_counter = REP_TO_CLS[rep](location=(x, y))
-                            self.world.add(self.deliver_counter)
-                        else:
-                            self.spawnable.append((x, y))
-                    y += 1
-                # Phase 2: Read in recipe list.
-                elif phase == 2:
-                    self.missions.append(getattr(recipe, line)())
+                    # Phase 1: Read in kitchen map.
+                    elif phase == 1:
+                        for x, rep in enumerate(line):
+                            # Ingredients/Recipes
+                            if rep in 'rpltcb':
+                                counter = PlainCounter(location=(x, y))
+                                obj = REP_TO_CLS[rep](location=(x, y))
+                                counter.add(obj)
+                                self.world.add(obj)
+                                self.world.add(counter)
+                            # Counter
+                            elif rep in '-PLTCBSZ':
+                                counter = REP_TO_CLS[rep](location=(x, y))
+                                self.world.add(counter)
+                            elif rep == 'D':
+                                self.deliver_counter = REP_TO_CLS[rep](location=(x, y))
+                                self.world.add(self.deliver_counter)
+                            else:
+                                self.spawnable.append((x, y))
+                        y += 1
+                    # Phase 2: Read in recipe list.
+                    elif phase == 2:
+                        self.missions.append(getattr(recipe, line)())
+            
+            self.world.missions = self.missions
+            self.world.incomplete = self.missions
+            self.world.width = x+1
+            self.world.height = y
+            self._world = self.world
+            self._missions = self.missions
+            self.incomplete = self.missions
+        else:
+            self.world = self._world
+            self.missions = self._missions
+            self.incomplete = self._missions
 
         while len(self.sim_agents) < self.num_agents:
             location = random.choice(self.spawnable)
@@ -90,14 +104,8 @@ class Overcooked(MultiAgentEnv):
             self.sim_agents.append(sim_agent)
             self.world.objects[location].append(sim_agent)
             self.world.full_obs_space[len(CLS_LIST)+len(self.sim_agents)-1][location[1]][location[0]] += 1
-
-        self.world.missions = self.missions
-        self.world.incomplete = self.missions
-        self.incomplete = self.missions
-        self.world.width = x+1
-        self.world.height = y
-
-    def reset(self):
+        
+    def reset(self, init=False):
         self.world = None
         self.missions = []
         self.incomplete = []
@@ -106,7 +114,7 @@ class Overcooked(MultiAgentEnv):
         self.sim_agents = []
         self.cur_step = 0
 
-        self.load_level(self.level)
+        self.load_level(self.level, init)
 
     def step(self, joint_action_dict):
         step_flag = [False] * len(joint_action_dict)
