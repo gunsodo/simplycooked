@@ -77,7 +77,7 @@ class Overcooked:
                                 self.world.add(counter)
                             elif rep == 'D':
                                 self.deliver_counter = REP_TO_CLS[rep](location=(x, y))
-                                self._deliver_counter = self.deliver_counter
+                                self._deliver_counter = copy.deepcopy(self.deliver_counter)
                                 self.world.add(self.deliver_counter)
                             else:
                                 self.spawnable.append((x, y))
