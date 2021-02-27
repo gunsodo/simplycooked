@@ -44,6 +44,8 @@ class VeggieBurger(Recipe):
         self.add(Bread(None))
         self.add(Tomato(None).chop())
         self.add(Lettuce(None).chop())
+        # self.add(Tomato(None))
+        # self.add(Lettuce(None))
         self.add(Bread(None))
 
 class DoubleCheeseBurger(Recipe):
