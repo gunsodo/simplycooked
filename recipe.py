@@ -1,8 +1,9 @@
 from ingredients import *
 
 class Recipe:
-    def __init__(self, location):
+    def __init__(self, location, index=-1):
         self.layers = 0
+        self.index = index
         self.contains = []
         self.name = 'Recipe'
         self.holded = False
@@ -42,8 +43,22 @@ class VeggieBurger(Recipe):
         super().__init__(None)
         self.name = 'VeggieBurger'
         self.add(Bread(None))
-        self.add(Tomato(None).chop())
-        self.add(Lettuce(None).chop())
+        # self.add(Tomato(None).chop())
+        # self.add(Lettuce(None).chop())
+        self.add(Tomato(None))
+        self.add(Lettuce(None))
+        self.add(Bread(None))
+
+class CheeseVeggieBurger(Recipe):
+    def __init__(self):
+        super().__init__(None)
+        self.name = 'CheeseVeggieBurger'
+        self.add(Bread(None))
+        # self.add(Tomato(None).chop())
+        # self.add(Lettuce(None).chop())
+        self.add(Tomato(None))
+        self.add(Cheese(None))
+        self.add(Lettuce(None))
         self.add(Bread(None))
 
 class DoubleCheeseBurger(Recipe):

@@ -106,6 +106,35 @@ class World:
     def get(self, location):
         return self.objects[location]
 
+    def update_location(self, obj, new_location):
+    # remove
+        self.objects[obj.location].remove(obj)
+        if isinstance(obj, Agent):
+            self.full_obs_space[len(CLS_LIST)+int(obj.name[-1])][obj.location[1]][obj.location[0]] -= 1
+        else:
+            self.full_obs_space[CLS_LIST.index(obj.name)][obj.location[1]][obj.location[0]] -= 1
+            if isinstance(obj, Recipe):
+                for item in obj.contains:
+                    self.objects[item.location].remove(item)
+                    self.full_obs_space[CLS_LIST.index(item.name)][item.location[1]][item.location[0]] -= 1
+        
+        # add
+        self.objects[new_location].append(obj)
+        if isinstance(obj, Agent):
+            self.full_obs_space[len(CLS_LIST)+int(obj.name[-1])][new_location[1]][new_location[0]] += 1
+        else:
+            self.full_obs_space[CLS_LIST.index(obj.name)][new_location[1]][new_location[0]] += 1
+            if isinstance(obj, Recipe):
+                for item in obj.contains:
+                    self.objects[new_location].append(item)
+                    self.full_obs_space[CLS_LIST.index(item.name)][new_location[1]][new_location[0]] += 1
+
+        # update
+        obj.location = new_location
+        if isinstance(obj, Recipe):
+            for item in obj.contains:
+                item.location = new_location
+                
     # def to_sparse(self, agent_name):
     #     obj_list = []
     #     agent_locs = []

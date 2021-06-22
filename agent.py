@@ -8,6 +8,7 @@ class Agent:
         self.holding = None
         self.location = location
         self.facing = facing
+        self.history = []
 
     def __str__(self):
         return f"{self.name} at {self.location} holding {self.holding}"
@@ -28,6 +29,7 @@ class Agent:
     def move(self, direction, world):
         x, y = self.location
         self.facing = direction
+        self.history.append(direction)
         if direction == 'w':
             y -= 1 # N
         elif direction == 'a':
@@ -46,12 +48,13 @@ class Agent:
 
         # floor
         if len(obj_list) == 0:
-            _update_location(self, (x, y), world)
+            world.update_location(self, (x, y))
             if self.holding:
-                _update_location(self.holding, (x, y), world)
+                world.update_location(self.holding, (x, y))
             return True
         
         elif _contains_instance(obj_list, Agent):
+            self.history.pop()
             return False
 
         # counter
@@ -73,7 +76,7 @@ class Agent:
                             pass
                         else:
                             c.add(self.drop())
-                            _update_location(c.contains, c.location, world)
+                            world.update_location(c.contains, c.location)
                     else:
                         pass
                 elif isinstance(c, PlainCounter):
@@ -84,16 +87,16 @@ class Agent:
                             if not contain.full():
                                 dropped = self.drop()
                                 contain.add(dropped)
-                                _update_location(dropped, c.location, world)
+                                world.update_location(dropped, c.location)
                     elif contain == None:                               # PlainCounter is empty, put it down
                         c.add(self.drop())
-                        _update_location(c.contains, c.location, world)
+                        world.update_location(c.contains, c.location)
                 elif isinstance(c, DeliverCounter):
                     if any(self.holding == mission for mission in world.incomplete):
                         dropped = self.drop()
                         dropped.delivered = True
                         c.add(dropped)
-                        _update_location(dropped, c.location, world)
+                        world.update_location(dropped, c.location)
                         world.incomplete.remove(dropped)
                 else:
                     pass    
@@ -103,18 +106,18 @@ class Agent:
                 if isinstance(c, IngredientCounter):
                     self.pick(c.remove())
                     world.add(self.holding)
-                    _update_location(self.holding, self.location, world)
+                    world.update_location(self.holding, self.location)
                 elif isinstance(c, ActionCounter):
                     if contain:
                         if contain.grilled or contain.chopped:          # already cooked, so pick it up
                             self.pick(c.remove())
-                            _update_location(self.holding, self.location, world)
+                            world.update_location(self.holding, self.location)
                         else:
                             c.action()
                 elif isinstance(c, PlainCounter):
                     if contain:
                         self.pick(c.remove())
-                        _update_location(self.holding, self.location, world)
+                        world.update_location(self.holding, self.location)
                 elif isinstance(c, DeliverCounter):
                     pass
                 else:
@@ -130,32 +133,3 @@ def _get_instance(obj_list, obj_cls):
         return None
     else:
         return instance[0]
-
-def _update_location(obj, new_location, world):
-    # remove
-    world.objects[obj.location].remove(obj)
-    if isinstance(obj, Agent):
-        world.full_obs_space[len(w.CLS_LIST)+int(obj.name[-1])][obj.location[1]][obj.location[0]] -= 1
-    else:
-        world.full_obs_space[w.CLS_LIST.index(obj.name)][obj.location[1]][obj.location[0]] -= 1
-        if isinstance(obj, Recipe):
-            for item in obj.contains:
-                world.objects[item.location].remove(item)
-                world.full_obs_space[w.CLS_LIST.index(item.name)][item.location[1]][item.location[0]] -= 1
-    
-    # add
-    world.objects[new_location].append(obj)
-    if isinstance(obj, Agent):
-        world.full_obs_space[len(w.CLS_LIST)+int(obj.name[-1])][new_location[1]][new_location[0]] += 1
-    else:
-        world.full_obs_space[w.CLS_LIST.index(obj.name)][new_location[1]][new_location[0]] += 1
-        if isinstance(obj, Recipe):
-            for item in obj.contains:
-                world.objects[new_location].append(item)
-                world.full_obs_space[w.CLS_LIST.index(item.name)][new_location[1]][new_location[0]] += 1
-
-    # update
-    obj.location = new_location
-    if isinstance(obj, Recipe):
-        for item in obj.contains:
-            item.location = new_location

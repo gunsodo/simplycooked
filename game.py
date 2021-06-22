@@ -46,6 +46,7 @@ class Overcooked:
     
     def load_level(self, level, init=False):
         x, y = 0, 0
+        recipe_index = 0
 
         if init:
             with open(level, 'r') as file:
@@ -65,19 +66,26 @@ class Overcooked:
                     elif phase == 1:
                         for x, rep in enumerate(line):
                             # Ingredients/Recipes
-                            if rep in 'rpltcb':
+                            if rep in 'pltcb':
                                 counter = PlainCounter(location=(x, y))
                                 obj = REP_TO_CLS[rep](location=(x, y))
                                 counter.add(obj)
                                 self.world.add(obj)
                                 self.world.add(counter)
+                            elif rep == 'r':
+                                counter = PlainCounter(location=(x, y))
+                                obj = REP_TO_CLS[rep](location=(x, y), index=recipe_index)
+                                counter.add(obj)
+                                self.world.add(obj)
+                                self.world.add(counter)
+                                recipe_index += 1
                             # Counter
                             elif rep in '-PLTCBSZ':
                                 counter = REP_TO_CLS[rep](location=(x, y))
                                 self.world.add(counter)
                             elif rep == 'D':
                                 self.deliver_counter = REP_TO_CLS[rep](location=(x, y))
-                                self._deliver_counter = copy.deepcopy(self.deliver_counter)
+                                self._deliver_counter = self.deliver_counter
                                 self.world.add(self.deliver_counter)
                             else:
                                 self.spawnable.append((x, y))
@@ -147,21 +155,51 @@ class Overcooked:
         world_recipes = self.world.recipes[:]
         world_recipes.sort(key=lambda x: x.layers, reverse=True)
 
-        reward = 0
+        reward_dict = dict()
+
         for recipe in world_recipes:
             if recipe.layers <= 0:
                 continue
+            reward_dict[recipe.index] = 0
             for i_recipe in incomplete:
                 if recipe.layers > i_recipe.layers:
                     continue
                 i_recipe_trim = i_recipe.trim(recipe.layers)
                 if i_recipe_trim == recipe:
-                    reward += recipe.layers * progress_rwd
+                    reward_dict[recipe.index] = recipe.layers * progress_rwd
                     incomplete.remove(i_recipe)
+                    break
         
-        for recipe in self.deliver_counter.contains:
-            reward += recipe.layers * progress_rwd + deliver_rwd
-
-        return reward
+        for recipe in world_recipes:
+            if recipe.delivered:
+                reward_dict[recipe.index] = recipe.layers * progress_rwd + deliver_rwd
+        
+        return reward_dict
     
+    @staticmethod
+    def compare_reward(r1, r2):
+        reward = 0
+
+        # assume that both dicts have the exact same set of keys
+        for k, v2 in r2.items():
+            try:
+                v1 = r1[k]
+            except:
+                v1 = 0
+            if v2 > v1:
+                reward += (v2-v1)
+        
+        return reward
+
+    @staticmethod
+    def get_max_reward(r1, r2):
+        reward_dict = dict()
+        for k, v2 in r2.items():
+            try:
+                v1 = r1[k]
+                reward_dict[k] = v2 if v2 > v1 else v1
+            except:
+                reward_dict[k] = v2
+        
+        return reward_dict
 

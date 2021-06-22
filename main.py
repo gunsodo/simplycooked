@@ -21,7 +21,7 @@ def start(num_agents, level, horizon):
     print(f"     horizon: {horizon}")
     print("-"*60)
 
-    reward = 0
+    reward = env.reward_by_progress()
 
     while not env.done():
         print(f"timestep: {env.cur_step}")
@@ -45,8 +45,7 @@ def start(num_agents, level, horizon):
         print("-"*60)
         print(f"# of completed subtasks: {env.count_completed()}")
         print(f"# of incompleted subtasks: {len(env.incomplete)}")
-        print(f"new score: {env.reward_by_progress() - reward}")
-        reward = env.reward_by_progress()
+        print(f"total score: {sum(list(env.reward_by_progress().values()))}")
         print("-"*60)
     
     if env.succeed():
